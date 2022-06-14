@@ -7,7 +7,7 @@ S3 = S3RemoteProvider(
 )
 prefix = config["prefix"]
 filename = config["filename"]
-data_source  = config["data_source"]
+data_source  = config["preprocess"]
 
 rule get_MultiAssayExp:
     output:
