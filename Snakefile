@@ -11,7 +11,7 @@ data_source  = config["preprocessed"]
 
 rule get_MultiAssayExp:
     output:
-        prefix + filename
+        S3.remote(prefix + filename)
     input:
         S3.remote(prefix + "processed/CLIN.csv"),
         S3.remote(prefix + "processed/EXPR.csv"),
