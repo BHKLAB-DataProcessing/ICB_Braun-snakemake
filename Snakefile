@@ -7,7 +7,7 @@ S3 = S3RemoteProvider(
 )
 prefix = config["prefix"]
 filename = config["filename"]
-data_source  = config["preprocessed"]
+data_source  = "https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Braun-data/main/"
 
 rule get_MultiAssayExp:
     output:
