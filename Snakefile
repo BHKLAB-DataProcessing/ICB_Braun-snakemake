@@ -16,17 +16,30 @@ rule get_MultiAssayExp:
         S3.remote(prefix + "processed/CLIN.csv"),
         S3.remote(prefix + "processed/EXPR.csv"),
         S3.remote(prefix + "processed/SNV.csv"),
-        S3.remote(prefix + "processed/cased_sequenced.csv")
+        S3.remote(prefix + "processed/cased_sequenced.csv"),
+        S3.remote(prefix + "annotation/Gencode.v19.annotation.RData")
+    resources:
+        mem_mb=3000,
+        disk_mb=3000
     shell:
         """
         Rscript -e \
         '
+        load(paste0("{prefix}", "annotation/Gencode.v19.annotation.RData"))
         source("https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Common/main/code/get_MultiAssayExp.R");
         saveRDS(
             get_MultiAssayExp(study = "Braun", input_dir = paste0("{prefix}", "processed")), 
             "{prefix}{filename}"
         );
         '
+        """
+
+rule download_annotation:
+    output:
+        S3.remote(prefix + "annotation/Gencode.v19.annotation.RData")
+    shell:
+        """
+        wget https://github.com/BHKLAB-Pachyderm/Annotations/blob/master/Gencode.v19.annotation.RData?raw=true -O {prefix}annotation/Gencode.v19.annotation.RData 
         """
 
 rule format_clin:
