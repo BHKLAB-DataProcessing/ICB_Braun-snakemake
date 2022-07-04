@@ -53,7 +53,7 @@ clin = clin[ clin$Arm %in% "NIVOLUMAB" , ]
 
 clin_patient = sort( unique( clin$SUBJID ) )
 
-patient = sort( unique( c( clin_patient , snv_patient , expr_patient ) ) )
+patient = sort( unique( c( intersect( clin_patient , snv_patient ) , intersect( clin_patient , expr_patient ) ) ) )
 
 case = as.data.frame( cbind( patient , rep( 0 , length(patient) ) , rep( 0 , length(patient) ) , rep( 0 , length(patient) ) ) )
 colnames(case) = c( "patient" , "snv" , "cna" , "expr" )
