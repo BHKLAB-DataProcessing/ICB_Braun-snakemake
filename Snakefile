@@ -10,14 +10,14 @@ filename = config["filename"]
 data_source  = "https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Braun-data/main/"
 
 rule get_MultiAssayExp:
-    output:
-        S3.remote(prefix + filename)
     input:
         S3.remote(prefix + "processed/CLIN.csv"),
         S3.remote(prefix + "processed/EXPR.csv"),
         S3.remote(prefix + "processed/SNV.csv"),
         S3.remote(prefix + "processed/cased_sequenced.csv"),
         S3.remote(prefix + "annotation/Gencode.v19.annotation.RData")
+    output:
+        S3.remote(prefix + filename)
     resources:
         mem_mb=3000,
         disk_mb=3000
@@ -43,11 +43,11 @@ rule download_annotation:
         """
 
 rule format_clin:
-    output:
-        S3.remote(prefix + "processed/CLIN.csv")
     input:
         S3.remote(prefix + "processed/cased_sequenced.csv"),
         S3.remote(prefix + "download/CLIN.txt")
+    output:
+        S3.remote(prefix + "processed/CLIN.csv")
     shell:
         """
         Rscript scripts/Format_CLIN.R \
@@ -56,12 +56,12 @@ rule format_clin:
         """
 
 rule format_expr:
-    output:
-        S3.remote(prefix + "processed/EXPR.csv")
     input:
         S3.remote(prefix + "download/EXPR.txt.gz"),
         S3.remote(prefix + "processed/cased_sequenced.csv"),
         S3.remote(prefix + "download/CLIN.txt")
+    output:
+        S3.remote(prefix + "processed/EXPR.csv")
     shell:
         """
         Rscript scripts/Format_EXPR.R \
@@ -70,12 +70,12 @@ rule format_expr:
         """
 
 rule format_snv:
-    output:
-        S3.remote(prefix + "processed/SNV.csv")
     input:
         S3.remote(prefix + "download/SNV.txt.gz"),
         S3.remote(prefix + "processed/cased_sequenced.csv"),
         S3.remote(prefix + "download/CLIN.txt")
+    output:
+        S3.remote(prefix + "processed/SNV.csv")
     shell:
         """
         Rscript scripts/Format_SNV.R \
@@ -84,12 +84,12 @@ rule format_snv:
         """
 
 rule format_cased_sequenced:
-    output:
-        S3.remote(prefix + "processed/cased_sequenced.csv")
     input:
         S3.remote(prefix + "download/CLIN.txt"),
         S3.remote(prefix + "download/EXPR.txt.gz"),
         S3.remote(prefix + "download/SNV.txt.gz")
+    output:
+        S3.remote(prefix + "processed/cased_sequenced.csv")
     shell:
         """
         Rscript scripts/Format_cased_sequenced.R \
@@ -97,14 +97,23 @@ rule format_cased_sequenced:
         {prefix}processed \
         """
 
-rule download_data:
+rule format_download_data:
+    input:
+        S3.remote(prefix + 'download/41591_2020_839_MOESM2_ESM.xlsx')
     output:
         S3.remote(prefix + "download/CLIN.txt"),
         S3.remote(prefix + "download/EXPR.txt.gz"),
         S3.remote(prefix + "download/SNV.txt.gz")
     shell:
         """
-        wget -O {prefix}download/CLIN.txt {data_source}CLIN.txt
-        wget -O {prefix}download/EXPR.txt.gz {data_source}EXPR.txt.gz
-        wget -O {prefix}download/SNV.txt.gz {data_source}SNV.txt.gz
+        Rscript scripts/format_downloaded_data.R {prefix}download 
         """ 
+
+rule download_data:
+    output:
+        S3.remote(prefix + 'download/41591_2020_839_MOESM2_ESM.xlsx')
+    shell:
+        """
+        wget -O {prefix}download/41591_2020_839_MOESM2_ESM.xlsx \
+        'https://static-content.springer.com/esm/art%3A10.1038%2Fs41591-020-0839-y/MediaObjects/41591_2020_839_MOESM2_ESM.xlsx'
+        """

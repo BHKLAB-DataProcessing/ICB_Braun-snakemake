@@ -31,7 +31,7 @@ snv_patient = sort( unique( data$Sample ) )
 ################################################################################################
 
 expr = as.data.frame( fread( file.path(input_dir, "EXPR.txt.gz")  , sep="\t" , dec="," , stringsAsFactors=FALSE ))
-expr = expr[ !( expr[,1] %in% c("01-mars", "02-mars") ) , ]
+expr = expr[ !( expr[,1] %in% c("43525", "43526") ) , ]
 rownames(expr)  = expr[,1] 
 expr = expr[,-1]
 

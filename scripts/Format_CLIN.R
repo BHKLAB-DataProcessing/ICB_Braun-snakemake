@@ -8,7 +8,7 @@ source("https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Common/main/code/
 clin_original = read.csv( file.path(input_dir, "CLIN.txt"), stringsAsFactors=FALSE , sep="\t" , dec=',')
 clin = clin_original[ clin_original$Arm %in% "NIVOLUMAB" , ]
 
-selected_cols <- c( "SUBJID" , "ORR" , "Sex" , "Age" , "OS" , "OS_CNSR" , "PFS..months." , "PFS_CNSR" )
+selected_cols <- c( "SUBJID" , "ORR" , "Sex" , "Age" , "OS" , "OS_CNSR" , "PFS" , "PFS_CNSR" )
 clin = cbind( clin[ , selected_cols ] , "PD-1/PD-L1" , "Kidney" , NA , NA , NA , NA , NA , NA )
 colnames(clin) = c( "patient" , "recist" , "sex"  ,"age"  , "t.os" , "os" , "t.pfs" , "pfs" , "drug_type" , "primary" , "response" , "response.other.info" , "histo" , "stage" , "dna" , "rna")
 
