@@ -17,5 +17,11 @@ colnames(expr) = id_patient[ colnames(expr) ]
 
 case = read.csv( file.path(output_dir, "cased_sequenced.csv"), stringsAsFactors=FALSE , sep=";" )
 expr = expr[ , colnames(expr) %in% case[ case$expr %in% 1 , ]$patient ]
+rows <- rownames(expr)
+expr <- sapply(expr, as.numeric)
+rownames(expr) <- rows
 
-write.table( expr , file= file.path(output_dir, "EXPR.csv") , quote=FALSE , sep=";" , col.names=TRUE , row.names=TRUE )
+tpm <- (2 ^ expr) - 1
+tpm <- log2(tpm + 0.001)
+
+write.table( tpm , file= file.path(output_dir, "EXPR.csv") , quote=FALSE , sep=";" , col.names=TRUE , row.names=TRUE )
