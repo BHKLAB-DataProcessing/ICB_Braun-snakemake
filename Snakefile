@@ -50,23 +50,12 @@ rule format_clin:
         {prefix}annotation
         """
 
-rule download_annotation:
-    output:
-        S3.remote(prefix + "annotation/Gencode.v19.annotation.RData"),
-        S3.remote(prefix + "annotation/curation_drug.csv"),
-        S3.remote(prefix + "annotation/curation_tissue.csv")
-    shell:
-        """
-        wget https://github.com/BHKLAB-Pachyderm/Annotations/blob/master/Gencode.v19.annotation.RData?raw=true -O {prefix}annotation/Gencode.v19.annotation.RData 
-        wget https://github.com/BHKLAB-Pachyderm/ICB_Common/raw/main/data/curation_drug.csv -O {prefix}annotation/curation_drug.csv
-        wget https://github.com/BHKLAB-Pachyderm/ICB_Common/raw/main/data/curation_tissue.csv -O {prefix}annotation/curation_tissue.csv
-        """
-
 rule format_expr:
     input:
         S3.remote(prefix + "download/EXPR.txt.gz"),
         S3.remote(prefix + "processed/cased_sequenced.csv"),
-        S3.remote(prefix + "download/CLIN.txt")
+        S3.remote(prefix + "download/CLIN.txt"),
+        S3.remote(prefix + "annotation/Gencode.v19.annotation.RData")
     output:
         S3.remote(prefix + "processed/EXPR.csv")
     shell:
@@ -74,6 +63,7 @@ rule format_expr:
         Rscript scripts/Format_EXPR.R \
         {prefix}download \
         {prefix}processed \
+        {prefix}annotation
         """
 
 rule format_snv:
@@ -115,6 +105,18 @@ rule format_download_data:
         """
         Rscript scripts/format_downloaded_data.R {prefix}download 
         """ 
+
+rule download_annotation:
+    output:
+        S3.remote(prefix + "annotation/Gencode.v19.annotation.RData"),
+        S3.remote(prefix + "annotation/curation_drug.csv"),
+        S3.remote(prefix + "annotation/curation_tissue.csv")
+    shell:
+        """
+        wget https://github.com/BHKLAB-Pachyderm/Annotations/blob/master/Gencode.v19.annotation.RData?raw=true -O {prefix}annotation/Gencode.v19.annotation.RData 
+        wget https://github.com/BHKLAB-Pachyderm/ICB_Common/raw/main/data/curation_drug.csv -O {prefix}annotation/curation_drug.csv
+        wget https://github.com/BHKLAB-Pachyderm/ICB_Common/raw/main/data/curation_tissue.csv -O {prefix}annotation/curation_tissue.csv
+        """
 
 rule download_data:
     output:
